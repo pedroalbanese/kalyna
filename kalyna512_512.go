@@ -2,8 +2,6 @@ package kalyna
 
 import (
     "crypto/cipher"
-
-    "github.com/deatil/go-cryptobin/tool/alias"
 )
 
 const BlockSize512_512 = 64
@@ -39,10 +37,6 @@ func (this *kalynaCipher512_512) Encrypt(dst, src []byte) {
         panic("cryptobin/kalyna: output not full block")
     }
 
-    if alias.InexactOverlap(dst[:BlockSize512_512], src[:BlockSize512_512]) {
-        panic("cryptobin/kalyna: invalid buffer overlap")
-    }
-
     this.encrypt(dst, src)
 }
 
@@ -53,10 +47,6 @@ func (this *kalynaCipher512_512) Decrypt(dst, src []byte) {
 
     if len(dst) < BlockSize512_512 {
         panic("cryptobin/kalyna: output not full block")
-    }
-
-    if alias.InexactOverlap(dst[:BlockSize512_512], src[:BlockSize512_512]) {
-        panic("cryptobin/kalyna: invalid buffer overlap")
     }
 
     this.decrypt(dst, src)
@@ -240,23 +230,9 @@ func (this *kalynaCipher512_512) expandKey(key []byte) {
 
     copy(this.erk[:], rk)
 
-    IMC(rk[136:])
-    IMC(rk[128:])
-    IMC(rk[120:])
-    IMC(rk[112:])
-    IMC(rk[104:])
-    IMC(rk[96:])
-    IMC(rk[88:])
-    IMC(rk[80:])
-    IMC(rk[72:])
-    IMC(rk[64:])
-    IMC(rk[56:])
-    IMC(rk[48:])
-    IMC(rk[40:])
-    IMC(rk[32:])
-    IMC(rk[24:])
-    IMC(rk[16:])
-    IMC(rk[8:])
+    for i := 136; i > 0; i -= 8 {
+        IMC(rk[i:])
+    }
 
     copy(this.drk[:], rk)
 }
