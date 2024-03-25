@@ -2,6 +2,8 @@ package kalyna
 
 import (
     "crypto/cipher"
+
+    "github.com/pedroalbanese/kalyna/internal/subtle"
 )
 
 const BlockSize128_128 = 16
@@ -37,6 +39,10 @@ func (this *kalynaCipher128_128) Encrypt(dst, src []byte) {
         panic("cryptobin/kalyna: output not full block")
     }
 
+    if subtle.InexactOverlap(dst[:BlockSize128_128], src[:BlockSize128_128]) {
+        panic("cryptobin/kalyna: invalid buffer overlap")
+    }
+
     this.encrypt(dst, src)
 }
 
@@ -47,6 +53,10 @@ func (this *kalynaCipher128_128) Decrypt(dst, src []byte) {
 
     if len(dst) < BlockSize128_128 {
         panic("cryptobin/kalyna: output not full block")
+    }
+
+    if subtle.InexactOverlap(dst[:BlockSize128_128], src[:BlockSize128_128]) {
+        panic("cryptobin/kalyna: invalid buffer overlap")
     }
 
     this.decrypt(dst, src)
